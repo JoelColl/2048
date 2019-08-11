@@ -12,5 +12,6 @@ deploy:
   keep-history: true
   github-token: $GITHUB_TOKEN
   local-dir: public
+  target-branch: master
   on:
-    branch: master
+    branch: develop
