@@ -1,2 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{190:function(o,e,n){"use strict";n.r(e);var r=n(11),s=(n(0),{name:"tokvmb",styles:"color:red;"});e.default=function(){var o=s;return Object(r.a)("div",{css:o},"Hello world!")}}}]);
-//# sourceMappingURL=component---src-pages-index-jsx-a74ab4cdd112ea8e530d.js.map
