@@ -46,7 +46,7 @@ const getBackgroundStyles = (value) => {
 
 function Tile({ isVisible, value }) {
   return (
-    <div css={[baseStyle, getBackgroundStyles(value)]}>
+    <div css={[baseStyle, isVisible && getBackgroundStyles(value)]}>
       {isVisible && <span css={[contentStyle, getTextStyles(value)]}>{value}</span>}
     </div>
   );
