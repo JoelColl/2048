@@ -1,3 +1,5 @@
+// Window not defined because server Side rendering
+/* eslint-disable no-undef */
 import { useEffect } from 'react';
 
 export default (key, callback) =>
