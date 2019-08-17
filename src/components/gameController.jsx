@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { css } from '@emotion/core';
 import PropTypes from 'prop-types';
+import useKey from '../hooks/useKey';
+
 import Tile from './Tile';
 
 const gameContainerStyles = css`
@@ -18,8 +20,11 @@ const gameContainerStyles = css`
 const initState = (gridSize) => {
   let state;
   for (let index = 0; index < gridSize; index += 1) {
-    state = { ...state, [index]: { value: 2048, isVisible: true } };
+    state = { ...state, [index]: { value: 2, isVisible: false } };
   }
+
+  const tileId = Math.floor(Math.random() * Object.keys(state).length);
+  state[tileId] = { value: 2, isVisible: true };
   return state;
 };
 
@@ -28,26 +33,28 @@ const generateGrid = (gridState) =>
     return <Tile key={index} value={value} isVisible={isVisible} />;
   });
 
-function generateTile(gridState) {
-  let tile;
-  let tileId;
-  do {
-    tileId = Math.floor(Math.random() * Object.keys(gridState).length);
-    tile = gridState[tileId];
-    console.log(tile);
-    console.log(tileId);
-  } while (tile.isVisible);
+const generateTile = (gridState) => {
+  const tileId = Math.floor(Math.random() * Object.keys(gridState).length);
+  const { isVisible } = gridState[tileId];
 
-  return { ...gridState, [tileId]: { ...gridState[tileId], isVisible: true } };
-}
+  if (!isVisible) {
+    return { ...gridState, [tileId]: { ...gridState[tileId], isVisible: true } };
+  }
+
+  return generateTile(gridState);
+};
 
 function gameController({ gridSize }) {
   const _gridSize = gridSize * gridSize;
   const [grid, setGrid] = useState(initState(_gridSize));
 
-  //   setGrid({ ...generateTile(grid) });\
+  useKey('ArrowUp', () => setGrid((state) => generateTile(state)));
 
-  return <div css={gameContainerStyles}>{generateGrid(grid, setGrid)}</div>;
+  return (
+    <>
+      <div css={gameContainerStyles}>{generateGrid(grid)}</div>;
+    </>
+  );
 }
 
 gameController.propTypes = {
