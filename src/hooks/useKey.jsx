@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 export default (key, callback) =>
   useEffect(() => {
-    const handler = (event) => event.key === key && callback();
+    const handler = (event) => event.key === key && callback(event);
 
     window.addEventListener('keydown', handler);
     return () => {

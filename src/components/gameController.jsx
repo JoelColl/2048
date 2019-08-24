@@ -18,37 +18,162 @@ const gameContainerStyles = css`
 `;
 
 const initState = (gridSize) => {
-  let state;
-  for (let index = 0; index < gridSize; index += 1) {
-    state = { ...state, [index]: { value: 2, isVisible: false } };
+  const state = new Array(gridSize);
+  for (let column = 0; column < gridSize; column += 1) {
+    state[column] = new Array(gridSize);
+    for (let row = 0; row < gridSize; row += 1) {
+      state[column][row] = { id: `${column}${row}`, value: 2, isVisible: false };
+    }
   }
 
-  const tileId = Math.floor(Math.random() * Object.keys(state).length);
-  state[tileId] = { value: 2, isVisible: true };
+  const columnId = Math.floor(Math.random() * Object.keys(state).length);
+  const rowId = Math.floor(Math.random() * Object.keys(state).length);
+  state[columnId][rowId] = { id: `${columnId}${rowId}`, value: 2, isVisible: true };
+
   return state;
 };
 
 const generateGrid = (gridState) =>
-  Object.entries(gridState).map(([index, { value, isVisible }]) => {
-    return <Tile key={index} value={value} isVisible={isVisible} />;
-  });
+  gridState.reduce(
+    (accumulator, column) => [
+      ...accumulator,
+      ...column.map(({ id, value, isVisible }) => {
+        return <Tile key={id} value={value} isVisible={isVisible} />;
+      }),
+    ],
+    [],
+  );
 
 const generateTile = (gridState) => {
-  const tileId = Math.floor(Math.random() * Object.keys(gridState).length);
-  const { isVisible } = gridState[tileId];
+  const columnId = Math.floor(Math.random() * Object.keys(gridState).length);
+  const rowId = Math.floor(Math.random() * Object.keys(gridState).length);
+  const { isVisible } = gridState[columnId][rowId];
 
   if (!isVisible) {
-    return { ...gridState, [tileId]: { ...gridState[tileId], isVisible: true } };
+    const newState = [...gridState];
+    newState[columnId][rowId] = {
+      ...gridState[columnId][rowId],
+      isVisible: true,
+    };
+
+    return newState;
   }
 
   return generateTile(gridState);
 };
 
-function gameController({ gridSize }) {
-  const _gridSize = gridSize * gridSize;
-  const [grid, setGrid] = useState(initState(_gridSize));
+const moveUp = (gridState) =>
+  gridState.map((column, columnId) =>
+    column.map((tile, rowId) => {
+      if (
+        tile.isVisible &&
+        gridState[columnId - 1] &&
+        gridState[columnId - 1][rowId] &&
+        !gridState[columnId - 1][rowId].isVisible
+      )
+        return { ...tile, isVisible: false };
+      if (
+        !tile.isVisible &&
+        gridState[columnId + 1] &&
+        gridState[columnId + 1][rowId] &&
+        gridState[columnId + 1][rowId].isVisible
+      )
+        return { ...tile, isVisible: true };
 
-  useKey('ArrowUp', () => setGrid((state) => generateTile(state)));
+      return tile;
+    }),
+  );
+
+const moveDown = (gridState) =>
+  gridState.map((column, columnId) =>
+    column.map((tile, rowId) => {
+      if (
+        tile.isVisible &&
+        gridState[columnId + 1] &&
+        gridState[columnId + 1][rowId] &&
+        !gridState[columnId + 1][rowId].isVisible
+      )
+        return { ...tile, isVisible: false };
+      if (
+        !tile.isVisible &&
+        gridState[columnId - 1] &&
+        gridState[columnId - 1][rowId] &&
+        gridState[columnId - 1][rowId].isVisible
+      )
+        return { ...tile, isVisible: true };
+
+      return tile;
+    }),
+  );
+
+const moveLeft = (gridState) =>
+  gridState.map((column, columnId) =>
+    column.map((tile, rowId) => {
+      if (
+        tile.isVisible &&
+        gridState[columnId][rowId + 1] &&
+        !gridState[columnId][rowId + 1].isVisible
+      )
+        return { ...tile, isVisible: false };
+      if (
+        !tile.isVisible &&
+        gridState[columnId][rowId + 1] &&
+        gridState[columnId][rowId + 1].isVisible
+      )
+        return { ...tile, isVisible: true };
+
+      return tile;
+    }),
+  );
+
+const moveRight = (gridState) =>
+  gridState.map((column, columnId) =>
+    column.map((tile, rowId) => {
+      if (
+        tile.isVisible &&
+        gridState[columnId][rowId - 1] &&
+        !gridState[columnId][rowId - 1].isVisible
+      )
+        return { ...tile, isVisible: false };
+      if (
+        !tile.isVisible &&
+        gridState[columnId][rowId - 1] &&
+        gridState[columnId][rowId - 1].isVisible
+      )
+        return { ...tile, isVisible: true };
+
+      return tile;
+    }),
+  );
+
+const moveGrid = (gridState, { key }) => {
+  let state;
+  switch (key) {
+    case 'ArrowUp':
+      state = moveUp(gridState);
+      break;
+    case 'ArrowDown':
+      state = moveDown(gridState);
+      break;
+    case 'ArrowLeft':
+      state = moveLeft(gridState);
+      break;
+    case 'ArrowRight':
+      state = moveRight(gridState);
+      break;
+    default:
+      return generateTile(gridState);
+  }
+  return generateTile(state);
+};
+
+function gameController({ gridSize }) {
+  const [grid, setGrid] = useState(initState(gridSize));
+
+  useKey('ArrowUp', (event) => setGrid((state) => moveGrid(state, event)));
+  useKey('ArrowDown', (event) => setGrid((state) => moveGrid(state, event)));
+  useKey('ArrowLeft', (event) => setGrid((state) => moveGrid(state, event)));
+  useKey('ArrowRight', (event) => setGrid((state) => moveGrid(state, event)));
 
   return (
     <>
