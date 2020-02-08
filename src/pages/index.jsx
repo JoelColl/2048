@@ -20,7 +20,7 @@ export default () => {
   return (
     <>
       <Global styles={globalStyles} />
-      <Main></Main>
+      <Main />
     </>
   );
 };
