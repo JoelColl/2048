@@ -4,4 +4,4 @@
  * See: https://www.gatsbyjs.org/docs/gatsby-config/
  */
 
-module.exports = { plugins: [`gatsby-plugin-emotion`] };
+module.exports = { plugins: [`gatsby-plugin-emotion`], pathPrefix: '/2048' };

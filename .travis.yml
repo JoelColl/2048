@@ -7,13 +7,4 @@ cache:
 script:
   - yarn test
   - yarn lint
-  - yarn build
-deploy:
-  provider: pages
-  skip-cleanup: true
-  keep-history: true
-  github-token: $GITHUB_TOKEN
-  local-dir: public
-  target-branch: master
-  on:
-    branch: develop
+  - yarn deploy
