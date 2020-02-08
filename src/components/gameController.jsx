@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { css } from '@emotion/core';
 import PropTypes from 'prop-types';
 import useKey from '../hooks/useKey';
-
+import { moveDown, moveLeft, moveRight, moveUp } from './gridMovement';
 import Tile from './Tile';
 
 const gameContainerStyles = css`
@@ -48,7 +48,6 @@ const generateTile = (gridState) => {
   const columnId = Math.floor(Math.random() * Object.keys(gridState).length);
   const rowId = Math.floor(Math.random() * Object.keys(gridState).length);
   const { isVisible } = gridState[columnId][rowId];
-
   if (!isVisible) {
     const newState = [...gridState];
     newState[columnId][rowId] = {
@@ -61,90 +60,6 @@ const generateTile = (gridState) => {
 
   return generateTile(gridState);
 };
-
-const moveUp = (gridState) =>
-  gridState.map((column, columnId) =>
-    column.map((tile, rowId) => {
-      if (
-        tile.isVisible &&
-        gridState[columnId - 1] &&
-        gridState[columnId - 1][rowId] &&
-        !gridState[columnId - 1][rowId].isVisible
-      )
-        return { ...tile, isVisible: false };
-      if (
-        !tile.isVisible &&
-        gridState[columnId + 1] &&
-        gridState[columnId + 1][rowId] &&
-        gridState[columnId + 1][rowId].isVisible
-      )
-        return { ...tile, isVisible: true };
-
-      return tile;
-    }),
-  );
-
-const moveDown = (gridState) =>
-  gridState.map((column, columnId) =>
-    column.map((tile, rowId) => {
-      if (
-        tile.isVisible &&
-        gridState[columnId + 1] &&
-        gridState[columnId + 1][rowId] &&
-        !gridState[columnId + 1][rowId].isVisible
-      )
-        return { ...tile, isVisible: false };
-      if (
-        !tile.isVisible &&
-        gridState[columnId - 1] &&
-        gridState[columnId - 1][rowId] &&
-        gridState[columnId - 1][rowId].isVisible
-      )
-        return { ...tile, isVisible: true };
-
-      return tile;
-    }),
-  );
-
-const moveLeft = (gridState) =>
-  gridState.map((column, columnId) =>
-    column.map((tile, rowId) => {
-      if (
-        tile.isVisible &&
-        gridState[columnId][rowId + 1] &&
-        !gridState[columnId][rowId + 1].isVisible
-      )
-        return { ...tile, isVisible: false };
-      if (
-        !tile.isVisible &&
-        gridState[columnId][rowId + 1] &&
-        gridState[columnId][rowId + 1].isVisible
-      )
-        return { ...tile, isVisible: true };
-
-      return tile;
-    }),
-  );
-
-const moveRight = (gridState) =>
-  gridState.map((column, columnId) =>
-    column.map((tile, rowId) => {
-      if (
-        tile.isVisible &&
-        gridState[columnId][rowId - 1] &&
-        !gridState[columnId][rowId - 1].isVisible
-      )
-        return { ...tile, isVisible: false };
-      if (
-        !tile.isVisible &&
-        gridState[columnId][rowId - 1] &&
-        gridState[columnId][rowId - 1].isVisible
-      )
-        return { ...tile, isVisible: true };
-
-      return tile;
-    }),
-  );
 
 const moveGrid = (gridState, { key }) => {
   let state;
